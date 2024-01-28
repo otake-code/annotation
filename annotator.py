@@ -11,7 +11,8 @@ class ImageAnnotationApp:
         self.root = root
         self.image_paths = image_paths
         self.anomaly_mode_path = anomaly_mode_path
-        # HACK 途中再開の場合は以下の値を変更，現在の値はshellから確認
+        self.rects = []
+        # HACK 途中再開の場合は以下の値を変更，前回のshellに表示された最後の値を与えればよい
         self.current_image_index = 0
         self.annotations = {}
 
@@ -73,8 +74,11 @@ class ImageAnnotationApp:
         self.canvas.bind("<ButtonPress-1>", self.on_click)
         self.anomaly_mode = None
         self.anomaly_location = None
+        self.delete_var.set(False)
         self.bboxes = []
         self.bboxes_corrected = []
+        for rect in self.rects:
+            self.canvas.delete(rect)
         self.rects = []
         self.image_path_label.config(text=f'{self.current_image_index}枚目：{image_path}')
         print(self.current_image_index)
