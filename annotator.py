@@ -13,7 +13,7 @@ class ImageAnnotationApp:
         self.anomaly_mode_path = anomaly_mode_path
         self.rects = []
         # HACK 途中再開の場合は以下の値を変更，前回のshellに表示された最後の値を与えればよい
-        self.current_image_index = 0
+        self.current_image_index = 170
         self.annotations = {}
 
         # レイアウト
@@ -228,11 +228,12 @@ class ImageAnnotationApp:
                     if not scope_listbox.get(scope_listbox.curselection())=='This':
                         self.scope = 'The {product} on the ' + scope_listbox.get(scope_listbox.curselection())
                     else:
-                        self.scope = scope_listbox.get(scope_listbox.curselection())
+                        self.scope = 'This {product}'
 
                 # 欠陥位置のリストボックスを取得
                 self.anomaly_location = fixed_tag_listbox.get(fixed_tag_listbox.curselection())
-                print(self.scope)
+
+                print(f'scope: {self.scope}')
                 new_window.destroy()
             else:
                 pass  # 両方のリストボックスからの選択がない場合、何もしない
@@ -273,8 +274,10 @@ class ImageAnnotationApp:
         scope_listbox_scrollbar.grid(row=1, column=3, sticky='nsew', padx=(0, 10))
         scope_listbox['yscrollcommand'] = tag_listbox_scrollbar.set
         # 対象物体選択用のテキストボックスの作成
+        scope_notice = tk.Label(new_window, text="Use [The {product}] to represent the object")
+        scope_notice.grid(row=2, column=2, padx=10, pady=5)
         scope_entry = tk.Entry(new_window, exportselection=0)
-        scope_entry.grid(row=2, column=2, padx=10, pady=5)
+        scope_entry.grid(row=3, column=2, padx=10, pady=5)
 
         # 欠陥位置用のリストボックス
         label_anomaly_location = tk.Label(new_window, text="Select anomaly location")
@@ -289,7 +292,7 @@ class ImageAnnotationApp:
 
         # 決定ボタンの作成
         select_button = tk.Button(new_window, text="Select Tag", command=on_button_press)
-        select_button.grid(row=3, column=0, columnspan=6, padx=10, pady=5)
+        select_button.grid(row=4, column=0, columnspan=6, padx=10, pady=5)
         # 元のウィンドウと同期
         new_window.wait_window()
 

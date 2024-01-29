@@ -1,7 +1,6 @@
 anomalies:
 - crack
 - hole
-- torn
 - wrinkle
 - bent
 - stain
@@ -10,3 +9,6 @@ anomalies:
 - discoloration
 - scratch
 - chip
+- tear
+- corrosion
+- dent
