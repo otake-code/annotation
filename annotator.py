@@ -171,8 +171,10 @@ class ImageAnnotationApp:
                 "removal": self.delete_var.get()
             }
             self.current_image_index += 1
-            # 次の画像があれば表示，なければjsonに出力
+            # 次の画像があれば表示，なければjsonに出力して終了
             if self.current_image_index < len(self.image_paths):
+                os.makedirs('annotations', exist_ok=True)
+                self.save_annotations('annotations/output_temp.json')
                 self.load_image(self.image_paths[self.current_image_index])
             else:
                 os.makedirs('annotations', exist_ok=True)
@@ -287,7 +289,7 @@ class ImageAnnotationApp:
 
         # 決定ボタンの作成
         select_button = tk.Button(new_window, text="Select Tag", command=on_button_press)
-        select_button.grid(row=3, column=0, columnspan=4, padx=10, pady=5)
+        select_button.grid(row=3, column=0, columnspan=6, padx=10, pady=5)
         # 元のウィンドウと同期
         new_window.wait_window()
 
