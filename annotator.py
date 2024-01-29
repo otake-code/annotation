@@ -264,23 +264,23 @@ class ImageAnnotationApp:
 
 
         # 対象物体選択用のリストボックス
-        object_scope = tk.Label(new_window, text="複数物体のうち対象を選択（単体の場合はThis）")
+        object_scope = tk.Label(new_window, text="画像中のどの位置にある製品か（単体の場合はThis）")
         object_scope.grid(row=0, column=2, padx=10, pady=5)
         scope_listbox = tk.Listbox(new_window, exportselection=0)
         scope_listbox.grid(row=1, column=2, padx=10, pady=5)
-        for scopens in ['This', 'left', 'right', 'top', 'bottom','foreground', 'background']:
+        for scopens in ['This', 'left', 'right', 'top', 'bottom', 'upper left', 'upper center', 'upper right', 'middle left', 'center', 'midle right', 'lower left', 'lower center', 'lower right', 'foreground', 'background']:
             scope_listbox.insert(tk.END, scopens)
         scope_listbox_scrollbar = tk.Scrollbar(new_window, orient="vertical", command=tag_listbox.yview)
         scope_listbox_scrollbar.grid(row=1, column=3, sticky='nsew', padx=(0, 10))
         scope_listbox['yscrollcommand'] = tag_listbox_scrollbar.set
         # 対象物体選択用のテキストボックスの作成
-        scope_notice = tk.Label(new_window, text="[the {product}] を用いて説明")
+        scope_notice = tk.Label(new_window, text="[the {product}] を用いて説明(例：The {product} in the center)")
         scope_notice.grid(row=2, column=2, padx=10, pady=5)
         scope_entry = tk.Entry(new_window, exportselection=0)
         scope_entry.grid(row=3, column=2, padx=10, pady=5)
 
         # 欠陥位置用のリストボックス
-        label_anomaly_location = tk.Label(new_window, text="欠陥位置")
+        label_anomaly_location = tk.Label(new_window, text="製品のどこに欠陥があるか")
         label_anomaly_location.grid(row=0, column=4, padx=10, pady=5)
         fixed_tag_listbox = tk.Listbox(new_window)
         fixed_tag_listbox.grid(row=1, column=4, padx=10, pady=5)
