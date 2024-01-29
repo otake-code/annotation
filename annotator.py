@@ -223,7 +223,7 @@ class ImageAnnotationApp:
                     self.scope = scope_text
                 else:
                     if not scope_listbox.get(scope_listbox.curselection())=='This':
-                        self.scope = 'The {product} on the ...' + scope_listbox.get(scope_listbox.curselection())
+                        self.scope = 'The {product} on the ' + scope_listbox.get(scope_listbox.curselection())
                     else:
                         self.scope = 'This {product} ...'
 
@@ -274,7 +274,7 @@ class ImageAnnotationApp:
         scope_listbox_scrollbar.grid(row=1, column=3, sticky='nsew', padx=(0, 10))
         scope_listbox['yscrollcommand'] = tag_listbox_scrollbar.set
         # 対象物体選択用のテキストボックスの作成
-        scope_notice = tk.Label(new_window, text="製品名は [~~~ of the {product}] で説明")
+        scope_notice = tk.Label(new_window, text="[the {product}] を用いて説明")
         scope_notice.grid(row=2, column=2, padx=10, pady=5)
         scope_entry = tk.Entry(new_window, exportselection=0)
         scope_entry.grid(row=3, column=2, padx=10, pady=5)
