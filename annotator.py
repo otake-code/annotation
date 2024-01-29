@@ -73,6 +73,7 @@ class ImageAnnotationApp:
         self.canvas_image = self.canvas.create_image(100, 20, anchor="nw", image=self.tk_image)
         self.canvas.bind("<ButtonPress-1>", self.on_click)
         self.anomaly_mode = None
+        self.scope = None
         self.anomaly_location = None
         self.delete_var.set(False)
         self.bboxes = []
@@ -83,8 +84,8 @@ class ImageAnnotationApp:
         self.image_path_label.config(text=f'{self.current_image_index}枚目：{image_path}')
         print(self.current_image_index)
         self.category_tag_entry.delete(0, tk.END)
-        # カテゴリ名はふり直さない場合が多いので，元のカテゴリをデフォで入力しておく．変更が必要な場合のみ手打ち
-        self.category_tag_entry.insert(0, image_path.split('\\')[2])
+        # カテゴリ名はふり直さない場合が多いので，元のカテゴリをデフォで入力しておく．変更が必要な場合のみ手打ち（HACK Linuxの場合は\\を/に直す）
+        self.category_tag_entry.insert(0, image_path.split('\\')[1])
         self.horizontal_line = self.canvas.create_line(0, 0, self.canvas.winfo_reqwidth(), 0, fill="blue")
         self.vertical_line = self.canvas.create_line(0, 0, 0, self.canvas.winfo_reqheight(), fill="blue")
 
@@ -130,8 +131,8 @@ class ImageAnnotationApp:
             self.select_anomaly_category(self.anomaly_mode_path)
             if self.anomaly_mode:
                 # タグが入力されるとBBoxの情報とタグを保存，224*224pixel用の値も保存
-                self.bboxes.append({"bbox": [min(self.start_x, end_x)-100, min(self.start_y, end_y)-20, max(self.start_x, end_x)-100, max(self.start_y, end_y)-20], "mode": self.anomaly_mode, "location": self.anomaly_location})
-                self.bboxes_corrected.append({"bbox": [float(round((min(self.start_x, end_x)-100)/256*224)), float(round((min(self.start_y, end_y)-20)/256*224)), float(round((max(self.start_x, end_x)-100)/256*224)), float(round((max(self.start_y, end_y)-20)/256*224))], "mode": self.anomaly_mode, "location": self.anomaly_location})
+                self.bboxes.append({"bbox": [min(self.start_x, end_x)-100, min(self.start_y, end_y)-20, max(self.start_x, end_x)-100, max(self.start_y, end_y)-20], "mode": self.anomaly_mode, "scope": self.scope, "location": self.anomaly_location})
+                self.bboxes_corrected.append({"bbox": [float(round((min(self.start_x, end_x)-100)/256*224)), float(round((min(self.start_y, end_y)-20)/256*224)), float(round((max(self.start_x, end_x)-100)/256*224)), float(round((max(self.start_y, end_y)-20)/256*224))], "mode": self.anomaly_mode, "scope": self.scope, "location": self.anomaly_location})
             else:
                 # タグ入力がキャンセルされた場合、BBoxを削除
                 self.canvas.delete(self.rect)
@@ -204,24 +205,32 @@ class ImageAnnotationApp:
         def on_button_press():
             # テキストボックスの文字列を取得
             entered_text = text_entry.get().strip()
+            scope_text = scope_entry.get().strip()
 
             # 両方のリストボックスから何かが選択されている場合のみ処理を続ける
-            if (entered_text or tag_listbox.curselection()) and fixed_tag_listbox.curselection():
+            if (entered_text or tag_listbox.curselection()) and (scope_text or scope_listbox.curselection()) and fixed_tag_listbox.curselection():
                 # 異常タグはテキストボックスが優先
                 if entered_text:
                     if entered_text not in tags:
                         tags.append(entered_text)
                         tag_listbox.insert(tk.END, entered_text)
                         update_yaml_file(yaml_file_path, tags)
-                    selected_anomaly_mode = entered_text
+                    self.anomaly_mode = entered_text
                 else:
-                    selected_anomaly_mode = tag_listbox.get(tag_listbox.curselection())
+                    self.anomaly_mode = tag_listbox.get(tag_listbox.curselection())
+
+                # 対象物体選択はテキストボックスが優先
+                if scope_text:
+                    self.scope = scope_text
+                else:
+                    if not scope_listbox.get(scope_listbox.curselection())=='This':
+                        self.scope = 'The {product} on the ' + scope_listbox.get(scope_listbox.curselection())
+                    else:
+                        self.scope = scope_listbox.get(scope_listbox.curselection())
 
                 # 欠陥位置のリストボックスを取得
                 self.anomaly_location = fixed_tag_listbox.get(fixed_tag_listbox.curselection())
-
-                # 選択されたタグを保存
-                self.anomaly_mode = selected_anomaly_mode
+                print(self.scope)
                 new_window.destroy()
             else:
                 pass  # 両方のリストボックスからの選択がない場合、何もしない
@@ -250,15 +259,30 @@ class ImageAnnotationApp:
         for tag in tags:
             tag_listbox.insert(tk.END, tag)
 
+
+        # 対象物体選択用のリストボックス
+        object_scope = tk.Label(new_window, text="Select Object scope")
+        object_scope.grid(row=0, column=2, padx=10, pady=5)
+        scope_listbox = tk.Listbox(new_window, exportselection=0)
+        scope_listbox.grid(row=1, column=2, padx=10, pady=5)
+        for scopens in ['This', 'left', 'right', 'top', 'bottom','foreground', 'background']:
+            scope_listbox.insert(tk.END, scopens)
+        scope_listbox_scrollbar = tk.Scrollbar(new_window, orient="vertical", command=tag_listbox.yview)
+        scope_listbox_scrollbar.grid(row=1, column=3, sticky='nsew', padx=(0, 10))
+        scope_listbox['yscrollcommand'] = tag_listbox_scrollbar.set
+        # 対象物体選択用のテキストボックスの作成
+        scope_entry = tk.Entry(new_window, exportselection=0)
+        scope_entry.grid(row=2, column=2, padx=10, pady=5)
+
         # 欠陥位置用のリストボックス
         label_anomaly_location = tk.Label(new_window, text="Select anomaly location")
-        label_anomaly_location.grid(row=0, column=2, padx=10, pady=5)
+        label_anomaly_location.grid(row=0, column=4, padx=10, pady=5)
         fixed_tag_listbox = tk.Listbox(new_window)
-        fixed_tag_listbox.grid(row=1, column=2, padx=10, pady=5)
-        for fixed_tag in ['whole', 'left', 'right', 'upper left', 'upper center', 'upper right', 'middle left', 'center', 'midle right', 'lower left', 'lower center', 'lower right']:
+        fixed_tag_listbox.grid(row=1, column=4, padx=10, pady=5)
+        for fixed_tag in ['whole', 'left', 'right', 'top', 'bottom', 'upper left', 'upper center', 'upper right', 'middle left', 'center', 'midle right', 'lower left', 'lower center', 'lower right']:
             fixed_tag_listbox.insert(tk.END, fixed_tag)
         fixed_tag_listbox_scrollbar = tk.Scrollbar(new_window, orient="vertical", command=fixed_tag_listbox.yview)
-        fixed_tag_listbox_scrollbar.grid(row=1, column=3, sticky='nsew', padx=(0, 10))
+        fixed_tag_listbox_scrollbar.grid(row=1, column=5, sticky='nsew', padx=(0, 10))
         fixed_tag_listbox['yscrollcommand'] = fixed_tag_listbox_scrollbar.set
 
         # 決定ボタンの作成
@@ -272,8 +296,8 @@ class ImageAnnotationApp:
         with open(json_path, 'w') as f:
             json.dump(self.annotations, f, indent=4)
             
-# 使用例
-path_list = sorted(glob.glob('VI_images/*/*/*/*'))
+# HACK パスは環境に合わせて治す
+path_list = sorted(glob.glob('./rename_ViEW/*/*/*'))
 anomaly_mode_path = 'anomalies.yaml'
 root = tk.Tk()
 app = ImageAnnotationApp(root, path_list, anomaly_mode_path)
