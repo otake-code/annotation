@@ -13,7 +13,7 @@ class ImageAnnotationApp:
         self.anomaly_mode_path = anomaly_mode_path
         self.rects = []
         # HACK 途中再開の場合は以下の値を変更，前回のshellに表示された最後の値を与えればよい
-        self.current_image_index = 170
+        self.current_image_index = 176
         self.annotations = {}
 
         # レイアウト
@@ -204,8 +204,11 @@ class ImageAnnotationApp:
         def on_button_press():
             # テキストボックスの文字列を取得
             entered_text = text_entry.get().strip()
+            entered_text.replace('product', '{product}')
             scope_text = scope_entry.get().strip()
+            scope_text.replace('product', '{product}')
             loc_text = loc_entry.get().strip()
+            loc_text.replace('product', '{product}')
 
             # 両方のリストボックスから何かが選択されている場合のみ処理を続ける
             if (entered_text or tag_listbox.curselection()) and (scope_text or scope_listbox.curselection()) and fixed_tag_listbox.curselection():
@@ -223,9 +226,11 @@ class ImageAnnotationApp:
                     self.scope = scope_text
                 else:
                     if not scope_listbox.get(scope_listbox.curselection())=='This':
+                        if scope_listbox.get(scope_listbox.curselection())=='center':
+                            self.scope = 'The {product} in the ' + scope_listbox.get(scope_listbox.curselection())
                         self.scope = 'The {product} on the ' + scope_listbox.get(scope_listbox.curselection())
                     else:
-                        self.scope = 'This {product} ...'
+                        self.scope = 'This {product}'
 
                 if loc_text:
                     self.anomaly_location = loc_text
@@ -264,33 +269,35 @@ class ImageAnnotationApp:
 
 
         # 対象物体選択用のリストボックス
-        object_scope = tk.Label(new_window, text="画像中のどの位置にある製品か（単体の場合はThis）")
+        #  json作成時は The {product} on/in the {scope}を想定 -> The {product} on the right
+        object_scope = tk.Label(new_window, text="画像中のどの位置にある製品か\n（単体の場合はThis）")
         object_scope.grid(row=0, column=2, padx=10, pady=5)
         scope_listbox = tk.Listbox(new_window, exportselection=0)
         scope_listbox.grid(row=1, column=2, padx=10, pady=5)
-        for scopens in ['This', 'left', 'right', 'top', 'bottom', 'upper left', 'upper center', 'upper right', 'middle left', 'center', 'midle right', 'lower left', 'lower center', 'lower right', 'foreground', 'background']:
+        for scopens in ['This', 'left', 'right', 'top', 'bottom', 'center', 'upper left', 'upper center', 'upper right', 'middle left', 'center', 'midle right', 'lower left', 'lower center', 'lower right', 'foreground', 'background']:
             scope_listbox.insert(tk.END, scopens)
         scope_listbox_scrollbar = tk.Scrollbar(new_window, orient="vertical", command=tag_listbox.yview)
         scope_listbox_scrollbar.grid(row=1, column=3, sticky='nsew', padx=(0, 10))
         scope_listbox['yscrollcommand'] = tag_listbox_scrollbar.set
         # 対象物体選択用のテキストボックスの作成
-        scope_notice = tk.Label(new_window, text="[the {product}] を用いて説明(例：The {product} in the center)")
+        scope_notice = tk.Label(new_window, text="手打ち：the product を用いて\n(例：The product in the center)")
         scope_notice.grid(row=2, column=2, padx=10, pady=5)
         scope_entry = tk.Entry(new_window, exportselection=0)
         scope_entry.grid(row=3, column=2, padx=10, pady=5)
 
         # 欠陥位置用のリストボックス
+        # json作成時は The {loc} of the {product} を想定 -> The whole of the product
         label_anomaly_location = tk.Label(new_window, text="製品のどこに欠陥があるか")
         label_anomaly_location.grid(row=0, column=4, padx=10, pady=5)
         fixed_tag_listbox = tk.Listbox(new_window)
         fixed_tag_listbox.grid(row=1, column=4, padx=10, pady=5)
-        for fixed_tag in ['whole', 'left', 'right', 'top', 'bottom', 'upper left', 'upper center', 'upper right', 'middle left', 'center', 'midle right', 'lower left', 'lower center', 'lower right']:
+        for fixed_tag in ['whole', 'left side', 'right side', 'top part', 'bottom part', 'center part', 'upper left', 'upper center', 'upper right', 'middle left', 'center', 'midle right', 'lower left', 'lower center', 'lower right']:
             fixed_tag_listbox.insert(tk.END, fixed_tag)
         fixed_tag_listbox_scrollbar = tk.Scrollbar(new_window, orient="vertical", command=fixed_tag_listbox.yview)
         fixed_tag_listbox_scrollbar.grid(row=1, column=5, sticky='nsew', padx=(0, 10))
         fixed_tag_listbox['yscrollcommand'] = fixed_tag_listbox_scrollbar.set
         # 対象物体選択用のテキストボックスの作成
-        loc_notice = tk.Label(new_window, text="[of the {product}]に続くように")
+        loc_notice = tk.Label(new_window, text="手打ち：of the product の前を入力\n(例：The whole)")
         loc_notice.grid(row=2, column=4, padx=10, pady=5)
         loc_entry = tk.Entry(new_window, exportselection=0)
         loc_entry.grid(row=3, column=4, padx=10, pady=5)
