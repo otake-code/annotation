@@ -29,7 +29,7 @@ class ImageAnnotationApp:
         self.separator_label.grid(row=1, column=0, sticky='w')
 
         # カテゴリ
-        self.label_category = Label(root, text="Enter category tag for the image:")
+        self.label_category = Label(root, text="カテゴリ名（必要があれば手打ちで修正）")
         self.label_category.grid(row=2, column=0, sticky='w')
         self.category_tag_entry = Entry(root)
         self.category_tag_entry.grid(row=3, column=0, sticky='ew')
@@ -205,10 +205,11 @@ class ImageAnnotationApp:
             # テキストボックスの文字列を取得
             entered_text = text_entry.get().strip()
             scope_text = scope_entry.get().strip()
+            loc_text = loc_entry.get().strip()
 
             # 両方のリストボックスから何かが選択されている場合のみ処理を続ける
             if (entered_text or tag_listbox.curselection()) and (scope_text or scope_listbox.curselection()) and fixed_tag_listbox.curselection():
-                # 異常タグはテキストボックスが優先
+                # テキストボックス優先
                 if entered_text:
                     if entered_text not in tags:
                         tags.append(entered_text)
@@ -218,19 +219,21 @@ class ImageAnnotationApp:
                 else:
                     self.anomaly_mode = tag_listbox.get(tag_listbox.curselection())
 
-                # 対象物体選択はテキストボックスが優先
                 if scope_text:
                     self.scope = scope_text
                 else:
                     if not scope_listbox.get(scope_listbox.curselection())=='This':
-                        self.scope = 'The {product} on the ' + scope_listbox.get(scope_listbox.curselection())
+                        self.scope = 'The {product} on the ...' + scope_listbox.get(scope_listbox.curselection())
                     else:
-                        self.scope = 'This {product}'
+                        self.scope = 'This {product} ...'
 
-                # 欠陥位置のリストボックスを取得
-                self.anomaly_location = fixed_tag_listbox.get(fixed_tag_listbox.curselection())
+                if loc_text:
+                    self.anomaly_location = loc_text
+                else:
+                    self.anomaly_location = fixed_tag_listbox.get(fixed_tag_listbox.curselection())
 
                 print(f'scope: {self.scope}')
+                print(f'location: {self.anomaly_location} of the ...')
                 new_window.destroy()
             else:
                 pass  # 両方のリストボックスからの選択がない場合、何もしない
@@ -243,7 +246,7 @@ class ImageAnnotationApp:
 
 
         # 異常タグ用のリストボックス
-        label_anomaly_mode = tk.Label(new_window, text="Select anomaly mode")
+        label_anomaly_mode = tk.Label(new_window, text="欠陥モード")
         label_anomaly_mode.grid(row=0, column=0, padx=10, pady=5)
         tag_listbox = tk.Listbox(new_window, exportselection=0)
         tag_listbox.grid(row=1, column=0, padx=10, pady=5)
@@ -261,7 +264,7 @@ class ImageAnnotationApp:
 
 
         # 対象物体選択用のリストボックス
-        object_scope = tk.Label(new_window, text="Select Object scope")
+        object_scope = tk.Label(new_window, text="複数物体のうち対象を選択（単体の場合はThis）")
         object_scope.grid(row=0, column=2, padx=10, pady=5)
         scope_listbox = tk.Listbox(new_window, exportselection=0)
         scope_listbox.grid(row=1, column=2, padx=10, pady=5)
@@ -271,13 +274,13 @@ class ImageAnnotationApp:
         scope_listbox_scrollbar.grid(row=1, column=3, sticky='nsew', padx=(0, 10))
         scope_listbox['yscrollcommand'] = tag_listbox_scrollbar.set
         # 対象物体選択用のテキストボックスの作成
-        scope_notice = tk.Label(new_window, text="Use [The {product}] to represent the object")
+        scope_notice = tk.Label(new_window, text="製品名は [the {product}] で説明")
         scope_notice.grid(row=2, column=2, padx=10, pady=5)
         scope_entry = tk.Entry(new_window, exportselection=0)
         scope_entry.grid(row=3, column=2, padx=10, pady=5)
 
         # 欠陥位置用のリストボックス
-        label_anomaly_location = tk.Label(new_window, text="Select anomaly location")
+        label_anomaly_location = tk.Label(new_window, text="欠陥位置")
         label_anomaly_location.grid(row=0, column=4, padx=10, pady=5)
         fixed_tag_listbox = tk.Listbox(new_window)
         fixed_tag_listbox.grid(row=1, column=4, padx=10, pady=5)
@@ -286,6 +289,11 @@ class ImageAnnotationApp:
         fixed_tag_listbox_scrollbar = tk.Scrollbar(new_window, orient="vertical", command=fixed_tag_listbox.yview)
         fixed_tag_listbox_scrollbar.grid(row=1, column=5, sticky='nsew', padx=(0, 10))
         fixed_tag_listbox['yscrollcommand'] = fixed_tag_listbox_scrollbar.set
+        # 対象物体選択用のテキストボックスの作成
+        loc_notice = tk.Label(new_window, text="[of the {product}]に続くように")
+        loc_notice.grid(row=2, column=4, padx=10, pady=5)
+        loc_entry = tk.Entry(new_window, exportselection=0)
+        loc_entry.grid(row=3, column=4, padx=10, pady=5)
 
         # 決定ボタンの作成
         select_button = tk.Button(new_window, text="Select Tag", command=on_button_press)
