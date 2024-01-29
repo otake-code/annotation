@@ -77,7 +77,6 @@ class ImageAnnotationApp:
         self.anomaly_location = None
         self.delete_var.set(False)
         self.bboxes = []
-        self.bboxes_corrected = []
         for rect in self.rects:
             self.canvas.delete(rect)
         self.rects = []
@@ -132,7 +131,7 @@ class ImageAnnotationApp:
             if self.anomaly_mode:
                 # タグが入力されるとBBoxの情報とタグを保存，224*224pixel用の値も保存
                 self.bboxes.append({"bbox": [min(self.start_x, end_x)-100, min(self.start_y, end_y)-20, max(self.start_x, end_x)-100, max(self.start_y, end_y)-20], "mode": self.anomaly_mode, "scope": self.scope, "location": self.anomaly_location})
-                self.bboxes_corrected.append({"bbox": [float(round((min(self.start_x, end_x)-100)/256*224)), float(round((min(self.start_y, end_y)-20)/256*224)), float(round((max(self.start_x, end_x)-100)/256*224)), float(round((max(self.start_y, end_y)-20)/256*224))], "mode": self.anomaly_mode, "scope": self.scope, "location": self.anomaly_location})
+                # self.bboxes_corrected.append({"bbox": [float(round((min(self.start_x, end_x)-100)/256*224)), float(round((min(self.start_y, end_y)-20)/256*224)), float(round((max(self.start_x, end_x)-100)/256*224)), float(round((max(self.start_y, end_y)-20)/256*224))], "mode": self.anomaly_mode, "scope": self.scope, "location": self.anomaly_location})
             else:
                 # タグ入力がキャンセルされた場合、BBoxを削除
                 self.canvas.delete(self.rect)
@@ -150,7 +149,6 @@ class ImageAnnotationApp:
             self.canvas.delete(last_rect)
             if self.bboxes:
                 self.bboxes.pop()
-                self.bboxes_corrected.pop()
         elif self.mark:
             # マーク（最初のクリックの位置）を取り消す
             self.canvas.delete(self.mark)
@@ -166,7 +164,6 @@ class ImageAnnotationApp:
             # jsonに格納する情報を保存
             self.annotations[self.image_paths[self.current_image_index]] = {
                 "bboxes": self.bboxes,
-                "bboxes_corrected": self.bboxes_corrected,
                 "category": category_tag,
                 "removal": self.delete_var.get()
             }
