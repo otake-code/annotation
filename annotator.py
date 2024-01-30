@@ -211,7 +211,7 @@ class ImageAnnotationApp:
             loc_text.replace('product', '{product}')
 
             # 両方のリストボックスから何かが選択されている場合のみ処理を続ける
-            if (entered_text or tag_listbox.curselection()) and (scope_text or scope_listbox.curselection()) and fixed_tag_listbox.curselection():
+            if (entered_text or tag_listbox.curselection()) and (scope_text or scope_listbox.curselection()) and (loc_text or fixed_tag_listbox.curselection()):
                 # テキストボックス優先
                 if entered_text:
                     if entered_text not in tags:
