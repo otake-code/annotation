@@ -278,7 +278,7 @@ class ImageAnnotationApp:
             scope_listbox.insert(tk.END, scopens)
         scope_listbox_scrollbar = tk.Scrollbar(new_window, orient="vertical", command=tag_listbox.yview)
         scope_listbox_scrollbar.grid(row=1, column=3, sticky='nsew', padx=(0, 10))
-        scope_listbox['yscrollcommand'] = tag_listbox_scrollbar.set
+        scope_listbox['yscrollcommand'] = scope_listbox_scrollbar.set
         # 対象物体選択用のテキストボックスの作成
         scope_notice = tk.Label(new_window, text="手打ち：the product を用いて\n(例：The product in the center)")
         scope_notice.grid(row=2, column=2, padx=10, pady=5)
