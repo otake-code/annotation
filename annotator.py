@@ -13,7 +13,7 @@ class ImageAnnotationApp:
         self.anomaly_mode_path = anomaly_mode_path
         self.rects = []
         # HACK 途中再開の場合は以下の値を変更，前回のshellに表示された最後の値を与えればよい
-        self.current_image_index = 195
+        self.current_image_index = 420
         self.annotations = {}
 
         # レイアウト
@@ -128,7 +128,7 @@ class ImageAnnotationApp:
 
             # タグ入力 -> 別ウィンドウ
             self.select_anomaly_category(self.anomaly_mode_path)
-            if self.anomaly_mode:
+            if self.anomaly_mode and self.scope and self.anomaly_location:
                 # タグが入力されるとBBoxの情報とタグを保存，224*224pixel用の値も保存
                 self.bboxes.append({"bbox": [min(self.start_x, end_x)-100, min(self.start_y, end_y)-20, max(self.start_x, end_x)-100, max(self.start_y, end_y)-20], "mode": self.anomaly_mode, "scope": self.scope, "location": self.anomaly_location})
                 # self.bboxes_corrected.append({"bbox": [float(round((min(self.start_x, end_x)-100)/256*224)), float(round((min(self.start_y, end_y)-20)/256*224)), float(round((max(self.start_x, end_x)-100)/256*224)), float(round((max(self.start_y, end_y)-20)/256*224))], "mode": self.anomaly_mode, "scope": self.scope, "location": self.anomaly_location})
