@@ -13,7 +13,7 @@ class ImageAnnotationApp:
         self.anomaly_mode_path = anomaly_mode_path
         self.rects = []
         # HACK 途中再開の場合は以下の値を変更，前回のshellに表示された最後の値を与えればよい
-        self.current_image_index = 176
+        self.current_image_index = 195
         self.annotations = {}
 
         # レイアウト
@@ -297,7 +297,7 @@ class ImageAnnotationApp:
         fixed_tag_listbox_scrollbar.grid(row=1, column=5, sticky='nsew', padx=(0, 10))
         fixed_tag_listbox['yscrollcommand'] = fixed_tag_listbox_scrollbar.set
         # 対象物体選択用のテキストボックスの作成
-        loc_notice = tk.Label(new_window, text="手打ち：of the product の前を入力\n(例：The whole)")
+        loc_notice = tk.Label(new_window, text="手打ち：of the product の前を入力\n(例：ternimal)")
         loc_notice.grid(row=2, column=4, padx=10, pady=5)
         loc_entry = tk.Entry(new_window, exportselection=0)
         loc_entry.grid(row=3, column=4, padx=10, pady=5)
