@@ -13,7 +13,7 @@ class ImageAnnotationApp:
         self.anomaly_mode_path = anomaly_mode_path
         self.rects = []
         # HACK 途中再開の場合は以下の値を変更，前回のshellに表示された最後の値を与えればよい
-        self.current_image_index = 2581
+        self.current_image_index = 2583
         self.annotations = {}
 
         # レイアウト
@@ -140,6 +140,7 @@ class ImageAnnotationApp:
             # 座標と印をリセット
             self.start_x = None
             self.start_y = None
+            self.mark = None
             self.canvas.delete(self.mark)
     
     # BBoxの取り消し
