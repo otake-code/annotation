@@ -13,7 +13,7 @@ class ImageAnnotationApp:
         self.anomaly_mode_path = anomaly_mode_path
         self.rects = []
         # HACK 途中再開の場合は以下の値を変更，前回のshellに表示された最後の値を与えればよい
-        self.current_image_index = 1222
+        self.current_image_index = 2581
         self.annotations = {}
 
         # レイアウト
@@ -205,11 +205,9 @@ class ImageAnnotationApp:
         def on_button_press():
             # テキストボックスの文字列を取得
             entered_text = text_entry.get().strip()
-            entered_text.replace('product', '{product}')
             scope_text = scope_entry.get().strip()
-            scope_text.replace('product', '{product}')
+            scope_text = scope_text.replace('product', '{product}')
             loc_text = loc_entry.get().strip()
-            loc_text.replace('product', '{product}')
 
             # 両方のリストボックスから何かが選択されている場合のみ処理を続ける
             if (entered_text or tag_listbox.curselection()) and (scope_text or scope_listbox.curselection()) and (loc_text or fixed_tag_listbox.curselection()):
