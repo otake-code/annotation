@@ -13,7 +13,7 @@ class ImageAnnotationApp:
         self.anomaly_mode_path = anomaly_mode_path
         self.rects = []
         # HACK 途中再開の場合は以下の値を変更，前回のshellに表示された最後の値を与えればよい
-        self.current_image_index = 2647
+        self.current_image_index = 12408
         self.annotations = {}
 
         # レイアウト
@@ -236,7 +236,7 @@ class ImageAnnotationApp:
                     self.anomaly_location = loc_text
                 else:
                     self.anomaly_location = fixed_tag_listbox.get(fixed_tag_listbox.curselection())
-
+                print(f'anomaly: {self.anomaly_mode}')
                 print(f'scope: {self.scope}')
                 print(f'location: {self.anomaly_location} of the ...')
                 new_window.destroy()
@@ -314,7 +314,7 @@ class ImageAnnotationApp:
             json.dump(self.annotations, f, indent=4)
             
 # HACK パスは環境に合わせて治す
-path_list = sorted(glob.glob('./rename_ViEW/*/*/*'))
+path_list = sorted(glob.glob('./rename_wo_view/*/*/*'))
 anomaly_mode_path = 'anomalies.yaml'
 root = tk.Tk()
 app = ImageAnnotationApp(root, path_list, anomaly_mode_path)
