@@ -119,10 +119,10 @@ class ImageAnnotationApp:
             end_y = max(image_y, min(raw_y, image_y + image_height - 1))
 
             # BBoxを描画
-            self.rect = self.canvas.create_rectangle(min(self.start_x, end_x), 
-                                                    min(self.start_y, end_y), 
-                                                    max(self.start_x, end_x), 
-                                                    max(self.start_y, end_y), 
+            self.rect = self.canvas.create_rectangle(min(self.start_x, end_x),
+                                                    min(self.start_y, end_y),
+                                                    max(self.start_x, end_x),
+                                                    max(self.start_y, end_y),
                                                     outline="red")
             self.rects.append(self.rect)
 
@@ -142,7 +142,7 @@ class ImageAnnotationApp:
             self.start_x = None
             self.start_y = None
             self.mark = None
-    
+
     # BBoxの取り消し
     def undo_last_box(self):
         if self.mark:
@@ -312,9 +312,9 @@ class ImageAnnotationApp:
     def save_annotations(self, json_path):
         with open(json_path, 'w') as f:
             json.dump(self.annotations, f, indent=4)
-            
+
 # HACK パスは環境に合わせて治す
-path_list = sorted(glob.glob('./rename_wo_view/*/*/*'))
+path_list = sorted(glob.glob('G:/共有ドライブ/お菓子データセット/snacks/rice_cracker/*/*/*.png'))
 anomaly_mode_path = 'anomalies.yaml'
 root = tk.Tk()
 app = ImageAnnotationApp(root, path_list, anomaly_mode_path)
